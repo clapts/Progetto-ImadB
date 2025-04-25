@@ -1,0 +1,11 @@
+function [thetaLS, phi, std, SSR] = autolscov(gradoMaxPolinomio, X, Y)
+    numParam=gradoMaxPolinomio+1;
+    phi = zeros(length(X), numParam);
+    thetaLS=zeros(1, numParam);
+
+    for i = 0:gradoMaxPolinomio
+        phi(:, i + 1) = X.^i;
+        [thetaLS(i), std(i)] = lscov(phi(:, 1:i+1), Y);
+    end
+        
+end
