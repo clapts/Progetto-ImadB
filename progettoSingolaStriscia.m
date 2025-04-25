@@ -8,13 +8,12 @@ La sfida ingegneristica consiste nel descrivere la relazione fra:
 %}
 
 clc,
-clear,
-close all;
+clear;
 
 load train_data.mat
 load val_data.mat
 
-figure(1)
+figure();
 Vtrain=data_train.Voltage;
 Ttrain=data_train.Temperature;
 SOCtrain=data_train.SOC;
@@ -55,7 +54,7 @@ Tval = [T; Tval];
 SOCval = [SOC; SOCval];
 
 % ora devo filtrarli nel range esterno a quello di temperatura scelto
-filtro=(Tval>-5)|(Tval<-15);
+filtro=((Tval<30)&(Tval>-15));
 
 Vval=Vval(filtro);
 Tval=Tval(filtro);
@@ -63,7 +62,7 @@ SOCval=SOCval(filtro);
 
 
 % filtro range temperatura bello
-filtro=(T<-5)&(T>-15);
+filtro=not(filtro);
 
 V=V(filtro);
 T=T(filtro);
@@ -76,7 +75,7 @@ SOClogit = log(SOC./(1-SOC));
 SOCval = log(SOCval./(1-SOCval));
 
 
-figure(2)
+figure();
 scatter3(V, T, SOClogit);
 grid on;
 xlabel("Voltage");
@@ -224,7 +223,7 @@ eps6v = (SOCval - Phi6v*theta6);
 SSRv(7) = eps6v'*eps6v;
 
 
-figure(44);
+figure();
 hold on;
 grid on;
 legend(); % attivo la legenda
@@ -238,7 +237,7 @@ plot(0:(length(SSR)-1), SSR, 'DisplayName', 'identificazione', 'Color', 'b');
 
 
 %% visualizzazione modelli 
-figure(29);
+figure();
 hold on;
 
 xgrid=linspace(min(V), max(V), 1000);
