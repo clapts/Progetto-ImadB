@@ -14,7 +14,7 @@ close all;
 load train_data.mat
 load val_data.mat
 
-figure(1)
+figure();
 Vtrain=data_train.Voltage;
 Ttrain=data_train.Temperature;
 SOCtrain=data_train.SOC;
@@ -54,7 +54,7 @@ SOClogit = log(SOC./(1-SOC));
 SOCval = log(SOCval./(1-SOCval));
 
 
-figure(2)
+figure();
 scatter3(V, T, SOClogit);
 grid on;
 xlabel("Voltage");
@@ -160,20 +160,27 @@ plot(0:(length(SSR)-1), SSR, 'DisplayName', 'identificazione', 'Color', 'b');
 hold off;
 title("Andamento SSR");
 ylabel("SSR");
-xlabel("Ordine modello");
+xlabel("Grado Polinomio");
+legend();
 
 
 subplot(2,2,2);
 plot(0:(length(FPE)-1), FPE, 'DisplayName', 'FPE');
 title("FPE");
+xlabel("Grado Polinomio");
+legend();
 
 subplot(2,2,3);
 plot(0:(length(AIC)-1), AIC, 'DisplayName', 'AIC');
 title("AIC");
+xlabel("Grado Polinomio");
+legend();
 
 subplot(2,2,4);
 plot(0:(length(MDL)-1), MDL, 'DisplayName', 'MDL');
 title("MDL");
+xlabel("Grado Polinomio");
+legend();
 
 % guardando AIC noto che il grande miglioramento lo ottengo dal 4° al 5°
 % modello, dopo il miglioramento diminuisce tantissimo, e vedo il gomito
@@ -182,43 +189,28 @@ title("MDL");
 % guardando la crossvalidazione noto che 
 
 
-%% visualizzazione modello
+%% visualizzazione modello scelto (5° grado, 6 parametri)
 figure();
 hold on;
 
 xgrid=linspace(min(V), max(V), 1000);
 
-phi0grid=[ones(1000,1)];
-phi1grid=[phi0grid, xgrid'];
-phi2grid=[phi1grid, (xgrid.^2)'];
-phi3grid=[phi2grid, (xgrid.^3)'];
-phi4grid=[phi3grid, (xgrid.^4)'];
-phi5grid=[phi4grid, (xgrid.^5)'];
-phi6grid=[phi5grid, (xgrid.^6)'];
+y5 = lscovgridcalc(theta5, xgrid);
 
-y0 = phi0grid*theta0;
-y1 = phi1grid*theta1;
-y2 = phi2grid*theta2;
-y3 = phi3grid*theta3;
-y4 = phi4grid*theta4;
-y5 = phi5grid*theta5;
-y6 = phi6grid*theta6;
-%clearvars phi0grid phi2grid phi3grid phi4grid phi5grid phi6grid xgrid; 
-
+subplot(1,2,1);
+hold on;
 scatter(V, expit(SOClogit), 'x');
-
-scatter(Vval, expit(SOCval), 'x');
-
-plot(xgrid, expit(y0), 'LineWidth', 2);
-plot(xgrid, expit(y1), 'LineWidth', 2);
-plot(xgrid, expit(y2), 'LineWidth', 2);
-plot(xgrid, expit(y3), 'LineWidth', 2);
-plot(xgrid, expit(y4), 'LineWidth', 2);
 plot(xgrid, expit(y5), 'LineWidth', 2);
-plot(xgrid, expit(y6), 'LineWidth', 2);
+title("Modello polinomiale spazio originario");
+
+subplot(1,2,2);
+hold on;
+scatter(V, SOClogit, 'x');
+plot(xgrid, y5, 'LineWidth', 2);
+title("Modello polinomiale spazio logit");
 
 
-
+%% aggiungo temperatura
 
 
 
