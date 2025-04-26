@@ -63,7 +63,7 @@ zlabel("SOC");
 
 %% modelli
 
-maxParametri=7;
+maxParametri=8;
 nV=length(SOClogit);
 
 %primo grado
@@ -109,12 +109,14 @@ SSR5 = eps5'*eps5;
 eps6 = (SOClogit - Phi6*theta6);
 SSR6 = eps6'*eps6;
 
+[theta7, ste7, SSR7]=autolscov(7, V, SOClogit);
+
 
 % Criteri
 AIC = zeros(1, maxParametri); % Preallocazione per i valori di AIC
 k_values = 1:1:maxParametri;
 
-SSR = [SSR0, SSR1, SSR2, SSR3, SSR4, SSR5, SSR6]; % Somme dei residui al quadrato per ogni modello
+SSR = [SSR0, SSR1, SSR2, SSR3, SSR4, SSR5, SSR6, SSR7]; % Somme dei residui al quadrato per ogni modello
 
 for i = 1:length(k_values)
     % q = grado modello
@@ -201,6 +203,7 @@ SSRv(6) = eps5v'*eps5v;
 eps6v = (SOCval - Phi6v*theta6);
 SSRv(7) = eps6v'*eps6v;
 
+SSRv(8) = calcSSR(Vval, SOCval, theta7);
 
 figure();
 hold on;
@@ -213,6 +216,14 @@ ylabel("SSR");
 xlabel("Ordine modello");
 
 plot(0:(length(SSR)-1), SSR, 'DisplayName', 'identificazione', 'Color', 'b');
+plot(0:(length(FPE)-1), FPE, 'DisplayName', 'FPE');
+
+% plotto AIC, MDL, FPE
+figure();
+hold on;
+plot(0:(length(AIC)-1), AIC, 'DisplayName', 'AIC');
+plot(0:(length(MDL)-1), MDL, 'DisplayName', 'MDL');
+
 
 
 %% visualizzazione modelli 
