@@ -62,61 +62,28 @@ ylabel("Temperature");
 zlabel("SOC");
 
 %% modelli
-
-maxParametri=8;
 nV=length(SOClogit);
 
-%primo grado
-Phi0 = ones(nV, 1);
-Phi1=[Phi0 V];
-Phi2=[Phi1 V.^2];
-Phi3=[Phi2 V.^3];
-Phi4=[Phi3 V.^4];
-Phi5=[Phi4 V.^5];
-Phi6=[Phi5 V.^6];
+[theta0, SSR(1)]=autolscov(0, V, SOClogit);
+[theta1, SSR(2)]=autolscov(1, V, SOClogit);
+[theta2, SSR(3)]=autolscov(2, V, SOClogit);
+[theta3, SSR(4)]=autolscov(3, V, SOClogit);
+[theta4, SSR(5)]=autolscov(4, V, SOClogit);
+[theta5, SSR(6)]=autolscov(5, V, SOClogit);
+[theta6, SSR(7)]=autolscov(6, V, SOClogit);
+[theta7, SSR(8)]=autolscov(7, V, SOClogit);
+[theta8, SSR(9)]=autolscov(8, V, SOClogit);
+[theta9, SSR(10)]=autolscov(9, V, SOClogit);
+[theta10, SSR(11)]=autolscov(10, V, SOClogit);
+[theta11, SSR(12)]=autolscov(11, V, SOClogit);
 
-[theta0, ste0] = lscov(Phi0, SOClogit);
-[theta1, ste1] = lscov(Phi1, SOClogit);
-[theta2, ste2] = lscov(Phi2, SOClogit);
-[theta3, ste3] = lscov(Phi3, SOClogit);
-[theta4, ste4] = lscov(Phi4, SOClogit);
-[theta5, ste5] = lscov(Phi5, SOClogit);
-[theta6, ste6] = lscov(Phi6, SOClogit);
-
-
-% SSR = eps'*eps
-% eps = Y - Yls
-% in questo caso la Y è la SOC
-
-eps0 = (SOClogit - Phi0*theta0);
-SSR0 = eps0'*eps0;
-
-eps1 = (SOClogit - Phi1*theta1);
-SSR1 = eps1'*eps1;
-
-eps2 = (SOClogit - Phi2*theta2);
-SSR2 = eps2'*eps2;
-
-eps3 = (SOClogit - Phi3*theta3);
-SSR3 = eps3'*eps3;
-
-eps4 = (SOClogit - Phi4*theta4);
-SSR4 = eps4'*eps4;
-
-eps5 = (SOClogit - Phi5*theta5);
-SSR5 = eps5'*eps5;
-
-eps6 = (SOClogit - Phi6*theta6);
-SSR6 = eps6'*eps6;
-
-[theta7, ste7, SSR7]=autolscov(7, V, SOClogit);
+maxParametri = length(SSR);
 
 
 % Criteri
 AIC = zeros(1, maxParametri); % Preallocazione per i valori di AIC
 k_values = 1:1:maxParametri;
 
-SSR = [SSR0, SSR1, SSR2, SSR3, SSR4, SSR5, SSR6, SSR7]; % Somme dei residui al quadrato per ogni modello
 
 for i = 1:length(k_values)
     % q = grado modello
@@ -168,65 +135,54 @@ passedTestF=TestF<Fa;
 % SSRv = epsv'*epsv
 % epsv = Y - Yv
 % Yv = PhiVal * thetaLS_ident
-nV=length(SOCval);
 
-Phi0v = ones(nV, 1);
-Phi1v=[Phi0v Vval];
-Phi2v=[Phi1v Vval.^2];
-Phi3v=[Phi2v Vval.^3];
-Phi4v=[Phi3v Vval.^4];
-Phi5v=[Phi4v Vval.^5];
-Phi6v=[Phi5v Vval.^6];
-
-% SSR = eps'*eps
-% eps = Y - Yv
-% Y = rendimentoValidazione
-% Yv = Phiv*theta = rendimento stimato
-eps0v = (SOCval - Phi0v*theta0);
-SSRv(1) = eps0v'*eps0v;
-
-eps1v = (SOCval - Phi1v*theta1);
-SSRv(2) = eps1v'*eps1v;
-
-eps2v = (SOCval - Phi2v*theta2);
-SSRv(3) = eps2v'*eps2v;
-
-eps3v = (SOCval - Phi3v*theta3);
-SSRv(4) = eps3v'*eps3v;
-
-eps4v = (SOCval - Phi4v*theta4);
-SSRv(5) = eps4v'*eps4v;
-
-eps5v = (SOCval - Phi5v*theta5);
-SSRv(6) = eps5v'*eps5v;
-
-eps6v = (SOCval - Phi6v*theta6);
-SSRv(7) = eps6v'*eps6v;
-
+SSRv(1) = calcSSR(Vval, SOCval, theta0);
+SSRv(2) = calcSSR(Vval, SOCval, theta1);
+SSRv(3) = calcSSR(Vval, SOCval, theta2);
+SSRv(4) = calcSSR(Vval, SOCval, theta3);
+SSRv(5) = calcSSR(Vval, SOCval, theta4);
+SSRv(6) = calcSSR(Vval, SOCval, theta5);
+SSRv(7) = calcSSR(Vval, SOCval, theta6);
 SSRv(8) = calcSSR(Vval, SOCval, theta7);
+SSRv(9) = calcSSR(Vval, SOCval, theta8);
+SSRv(10) = calcSSR(Vval, SOCval, theta9);
+SSRv(11) = calcSSR(Vval, SOCval, theta10);
+SSRv(12) = calcSSR(Vval, SOCval, theta11);
 
 figure();
-hold on;
 grid on;
 legend(); % attivo la legenda
 
+subplot(2,2,1);
+hold on;
 plot(0:(length(SSRv)-1), SSRv, 'DisplayName', 'validazione', 'Color', 'r');
+plot(0:(length(SSR)-1), SSR, 'DisplayName', 'identificazione', 'Color', 'b');
+hold off;
 title("Andamento SSR");
 ylabel("SSR");
 xlabel("Ordine modello");
 
-plot(0:(length(SSR)-1), SSR, 'DisplayName', 'identificazione', 'Color', 'b');
+
+subplot(2,2,2);
 plot(0:(length(FPE)-1), FPE, 'DisplayName', 'FPE');
+title("FPE");
 
-% plotto AIC, MDL, FPE
-figure();
-hold on;
+subplot(2,2,3);
 plot(0:(length(AIC)-1), AIC, 'DisplayName', 'AIC');
+title("AIC");
+
+subplot(2,2,4);
 plot(0:(length(MDL)-1), MDL, 'DisplayName', 'MDL');
+title("MDL");
+
+% guardando AIC noto che il grande miglioramento lo ottengo dal 4° al 5°
+% modello, dopo il miglioramento diminuisce tantissimo, e vedo il gomito
+% della curva. tengo modello quinto grado
+
+% guardando la crossvalidazione noto che 
 
 
-
-%% visualizzazione modelli 
+%% visualizzazione modello
 figure();
 hold on;
 

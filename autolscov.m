@@ -1,4 +1,4 @@
-function [thetaLS, std, SSR] = autolscov(gradoMaxPolinomio, X, Y)
+function [thetaLS, SSR] = autolscov(gradoMaxPolinomio, X, Y)
 
     phi = zeros(length(X), gradoMaxPolinomio+1);
 
