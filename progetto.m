@@ -211,7 +211,116 @@ title("Modello polinomiale spazio logit");
 
 
 %% aggiungo temperatura
+% avevo scelto quinto grado (modello 6) per la tensione
 
+% Nuovi modelli
+[theta02v, SSR2(1)] = autolscov2var(0, V, T, SOClogit);
+[theta12v, SSR2(2)] = autolscov2var(1, V, T, SOClogit);
+[theta22v, SSR2(3)] = autolscov2var(2, V, T, SOClogit);
+[theta32v, SSR2(4)] = autolscov2var(3, V, T, SOClogit);
+[theta42v, SSR2(5)] = autolscov2var(4, V, T, SOClogit);
+[theta52v, SSR2(6)] = autolscov2var(5, V, T, SOClogit);
+[theta62v, SSR2(7)] = autolscov2var(6, V, T, SOClogit);
+[theta72v, SSR2(8)] = autolscov2var(7, V, T, SOClogit);
+[theta82v, SSR2(9)] = autolscov2var(8, V, T, SOClogit);
+
+
+
+maxParametri = length(SSR2);
+
+
+% Criteri
+AIC2 = zeros(1, maxParametri); % Preallocazione per i valori di AIC
+k_values = 1:1:maxParametri;  % gradi del polinomio
+
+for i = 1:length(k_values)
+    % q = grado modello
+    q = k_values(i);
+    % nV è il numero di osservazioni
+    AIC2(i) = (2*q/nV) + log(SSR2(i));
+end
+
+
+FPE2 = zeros(1, maxParametri);
+for i = 1:length(k_values)
+    % q = grado modello
+    q = k_values(i);
+    % nV è il numero di osservazioni
+    FPE2(i) = (nV+q)/(nV-q) * SSR2(i);
+end
+
+
+MDL2 = zeros(1, maxParametri);
+for i = 1:length(k_values)
+    % q = grado modello
+    q = k_values(i);
+    % nV è il numero di osservazioni
+    MDL2(i) = (log(nV)*q)/(nV) * log(SSR2(i));
+end
+
+% come prima il test f è sempre superato
+
+%% crossvalidazione
+
+% calcolo SSR2v
+% SOCval è già in logit
+
+phi02 = phicalc(0, Vval, Tval, SOClogit);
+phi12 = phicalc(1, Vval, Tval, SOClogit);
+phi22 = phicalc(2, Vval, Tval, SOClogit);
+phi32 = phicalc(3, Vval, Tval, SOClogit);
+phi42 = phicalc(4, Vval, Tval, SOClogit);
+phi52 = phicalc(5, Vval, Tval, SOClogit);
+phi62 = phicalc(6, Vval, Tval, SOClogit);
+phi72 = phicalc(7, Vval, Tval, SOClogit);
+phi82 = phicalc(8, Vval, Tval, SOClogit);
+
+
+SSR2v(1) = calcSSR2var(phi02, theta02v, SOCval);
+SSR2v(2) = calcSSR2var(phi12, theta12v, SOCval);
+SSR2v(3) = calcSSR2var(phi22, theta22v, SOCval);
+SSR2v(4) = calcSSR2var(phi32, theta32v, SOCval);
+SSR2v(5) = calcSSR2var(phi42, theta42v, SOCval);
+SSR2v(6) = calcSSR2var(phi52, theta52v, SOCval);
+SSR2v(7) = calcSSR2var(phi62, theta62v, SOCval);
+SSR2v(8) = calcSSR2var(phi72, theta72v, SOCval);
+SSR2v(9) = calcSSR2var(phi82, theta82v, SOCval);
+
+
+% plotting di AIC, MDL, FPE, Crossval
+
+figure();
+grid on;
+legend(); % attivo la legenda
+
+subplot(2,2,1);
+hold on;
+%plot(0:(length(SSR2v)-1), SSR2v, 'DisplayName', 'validazione', 'Color', 'r');
+plot(0:(length(SSR2)-1), SSR2, 'DisplayName', 'identificazione', 'Color', 'b');
+hold off;
+title("Andamento SSR 2 Variabili");
+ylabel("SSR 2 Variabili");
+xlabel("Grado Polinomio");
+legend();
+
+
+subplot(2,2,2);
+plot(0:(length(FPE2)-1), FPE2, 'DisplayName', 'FPE');
+title("FPE 2 var");
+xlabel("Grado Polinomio");
+legend();
+
+subplot(2,2,3);
+plot(0:(length(AIC2)-1), AIC2, 'DisplayName', 'AIC');
+title("AIC 2 var");
+xlabel("Grado Polinomio");
+legend();
+
+subplot(2,2,4);
+plot(0:(length(MDL2)-1), MDL2, 'DisplayName', 'MDL');
+title("MDL 2 var");
+xlabel("Grado Polinomio");
+legend();
 
 
 
