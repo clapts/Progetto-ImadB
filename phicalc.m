@@ -1,4 +1,4 @@
-function [phi] = phicalc(gradoMaxPolinomio, X1, X2, Y)
+function [phi] = phicalc(gradoMaxPolinomio, X1, X2)
     n = length(X1);
     phi = ones(n, 1); % Partiamo con il termine di grado 0
     
