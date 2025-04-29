@@ -1,4 +1,4 @@
-function [phi] = phicalc(gradoMaxPolinomio, X1, X2)
+function [thetaLS, SSR, phi] = autolscov2var(gradoMaxPolinomio, X1, X2, Y)
     n = length(X1);
     phi = ones(n, 1); % Partiamo con il termine di grado 0
     
@@ -10,4 +10,8 @@ function [phi] = phicalc(gradoMaxPolinomio, X1, X2)
             phi = [phi, nuovaColonna];
         end
     end
+    
+    thetaLS = lscov(phi, Y);
+    eps = Y - phi * thetaLS;
+    SSR = eps' * eps;
 end

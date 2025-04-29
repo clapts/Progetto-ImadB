@@ -265,15 +265,15 @@ end
 % calcolo SSR2v
 % SOCval è già in logit
 
-phi02 = phicalc(0, Vval, Tval, SOClogit);
-phi12 = phicalc(1, Vval, Tval, SOClogit);
-phi22 = phicalc(2, Vval, Tval, SOClogit);
-phi32 = phicalc(3, Vval, Tval, SOClogit);
-phi42 = phicalc(4, Vval, Tval, SOClogit);
-phi52 = phicalc(5, Vval, Tval, SOClogit);
-phi62 = phicalc(6, Vval, Tval, SOClogit);
-phi72 = phicalc(7, Vval, Tval, SOClogit);
-phi82 = phicalc(8, Vval, Tval, SOClogit);
+phi02 = phicalc(0, Vval, Tval);
+phi12 = phicalc(1, Vval, Tval);
+phi22 = phicalc(2, Vval, Tval);
+phi32 = phicalc(3, Vval, Tval);
+phi42 = phicalc(4, Vval, Tval);
+phi52 = phicalc(5, Vval, Tval);
+phi62 = phicalc(6, Vval, Tval);
+phi72 = phicalc(7, Vval, Tval);
+phi82 = phicalc(8, Vval, Tval);
 
 
 SSR2v(1) = calcSSR2var(phi02, theta02v, SOCval);
