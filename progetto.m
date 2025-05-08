@@ -32,6 +32,8 @@ scatter3(Vval, Tval, SOCval);
 xlabel("Voltage");
 ylabel("Temperature");
 zlabel("SOC");
+title("Dati originali");
+legend();
 
 
 %% 2.2
@@ -324,6 +326,6 @@ xlabel("Grado Polinomio");
 legend();
 
 
-lscov
+
 
 
