@@ -14,7 +14,7 @@ clear;
 load train_data.mat
 load val_data.mat
 
-figure();
+
 Vtrain=data_train.Voltage;
 Ttrain=data_train.Temperature;
 SOCtrain=data_train.SOC;
@@ -22,15 +22,6 @@ Vval=data_val.Voltage;
 Tval=data_val.Temperature;
 SOCval=data_val.SOC;
 
-hold on;
-grid on;
-
-scatter3(Vtrain, Ttrain, SOCtrain);
-
-scatter3(Vval, Tval, SOCval);
-xlabel("Voltage");
-ylabel("Temperature");
-zlabel("SOC");
 
 
 %% 2.2
@@ -84,6 +75,17 @@ SOCval = SOC(idx);
 V(idx) = [];
 T(idx) = [];
 SOC(idx) = [];
+
+figure();
+scatter3(Vval, Tval, SOCval);
+hold on;
+grid on;
+scatter3(V, T, SOC);
+xlabel("Voltage");
+ylabel("Temperature");
+zlabel("SOC");
+title("dati modello");
+legend();
 
 
 %% trasformazione, applico la logit sia ai dati di identificazioni che valid
@@ -290,6 +292,43 @@ plot(xgrid, expit(y6), 'LineWidth', 2);
 
 
 
+
+figure();
+grid on;
+legend(); % attivo la legenda
+
+subplot(2,2,1);
+hold on;
+plot(0:(length(SSRv)-1), SSRv, 'DisplayName', 'validazione', 'Color', 'r');
+plot(0:(length(SSR)-1), SSR, 'DisplayName', 'identificazione', 'Color', 'b');
+hold off;
+title("Andamento SSR");
+ylabel("SSR");
+xlabel("Grado Polinomio");
+legend();
+
+
+subplot(2,2,2);
+plot(0:(length(FPE)-1), FPE, 'DisplayName', 'FPE');
+title("FPE");
+xlabel("Grado Polinomio");
+legend();
+
+subplot(2,2,3);
+plot(0:(length(AIC)-1), AIC, 'DisplayName', 'AIC');
+title("AIC");
+xlabel("Grado Polinomio");
+legend();
+
+subplot(2,2,4);
+plot(0:(length(MDL)-1), MDL, 'DisplayName', 'MDL');
+title("MDL");
+xlabel("Grado Polinomio");
+legend();
+
+% guardando AIC noto che il grande miglioramento lo ottengo dal 4° al 5°
+% modello, dopo il miglioramento diminuisce tantissimo, e vedo il gomito
+% della curva. tengo modello quinto grado
 
 
 
