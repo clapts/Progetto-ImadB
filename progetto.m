@@ -7,6 +7,7 @@ La sfida ingegneristica consiste nel descrivere la relazione fra:
 
 %}
 
+
 clc,
 clear,
 close all;
@@ -322,5 +323,7 @@ title("MDL 2 var");
 xlabel("Grado Polinomio");
 legend();
 
+
+lscov
 
 
