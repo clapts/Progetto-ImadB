@@ -1,4 +1,4 @@
-function [thetaLS, SSR, phi] = autolscov2var(gradoMaxPolinomio, X1, X2, Y)
+function [thetaLS, SSR, phi, ste] = autolscov2var(gradoMaxPolinomio, X1, X2, Y)
     n = length(X1);
     phi = ones(n, 1); % Partiamo con il termine di grado 0
     
@@ -11,7 +11,7 @@ function [thetaLS, SSR, phi] = autolscov2var(gradoMaxPolinomio, X1, X2, Y)
         end
     end
     
-    thetaLS = lscov(phi, Y);
+    [thetaLS, ste] = lscov(phi, Y);
     eps = Y - phi * thetaLS;
     SSR = eps' * eps;
 end

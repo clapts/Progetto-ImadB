@@ -1,4 +1,4 @@
-function [thetaLS, SSR] = autolscov(gradoMaxPolinomio, X, Y)
+function [thetaLS, SSR, ste] = autolscov(gradoMaxPolinomio, X, Y)
 
     phi = zeros(length(X), gradoMaxPolinomio+1);
 
@@ -8,7 +8,7 @@ function [thetaLS, SSR] = autolscov(gradoMaxPolinomio, X, Y)
 
     end
 
-    thetaLS = lscov(phi, Y);
+    [thetaLS, ste] = lscov(phi, Y);
     eps = (Y - phi * thetaLS);
     SSR = eps'*eps;
         
