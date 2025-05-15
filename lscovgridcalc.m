@@ -1,4 +1,4 @@
-function [ygrid] = lscovgridcalc(thetaLS, xgrid)
+function [res_grid] = lscovgridcalc(thetaLS, xgrid, ygrid)
     % thetaLS parametri di un polinomio, da grado 0 a grado N (dimensione
     % del polinomio
 
@@ -7,6 +7,7 @@ function [ygrid] = lscovgridcalc(thetaLS, xgrid)
 
     % la matrice phigrid ha dim(xgrid) righe e dim(thetaLS) colonne
     numeroParametri = length(thetaLS);
+
     phigrid = zeros(length(xgrid), numeroParametri);
 
     for i = 1:numeroParametri
@@ -15,7 +16,6 @@ function [ygrid] = lscovgridcalc(thetaLS, xgrid)
         phigrid(:, i) = xgrid.^(i-1);
 
     end
-
-    ygrid = phigrid*thetaLS;
+    res_grid = phigrid*thetaLS;
         
 end

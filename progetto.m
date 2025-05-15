@@ -298,7 +298,7 @@ legend(); % attivo la legenda
 
 subplot(2,2,1);
 hold on;
-%plot(0:(length(SSR2v)-1), SSR2v, 'DisplayName', 'validazione', 'Color', 'r');
+plot(0:(length(SSR2v)-1), SSR2v, 'DisplayName', 'validazione', 'Color', 'r');
 plot(0:(length(SSR2)-1), SSR2, 'DisplayName', 'identificazione', 'Color', 'b');
 hold off;
 title("Andamento SSR 2 Variabili");
@@ -325,7 +325,27 @@ title("MDL 2 var");
 xlabel("Grado Polinomio");
 legend();
 
+%% plot del modello con 2 variabili come regressori
 
 
+% è superficie logit polinomiale
+[phi5asd, Phi5_grid, X, Y] = phicalc(4, V, T, 100);
 
+z_grid = Phi5_grid*theta42v;
+SOCgrid=reshape(z_grid, size(X));
+
+figure();
+scatter3(V, T, SOClogit);
+%è in logit
+hold on;
+
+mesh(X, Y, SOCgrid);
+
+scatter3(Vval, Tval, SOCval);
+
+%% RMSE
+
+for i=1:9
+    RMSE(i)=SSR2(i)/i;
+end
 
