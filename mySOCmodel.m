@@ -1,7 +1,6 @@
 function soc_pred = mySOCmodel(voltage_vec, temp_vec)
     load model.mat
     
-    gradoPolinomio=length(thetaModel)-1;
     n = length(voltage_vec);
     phi = ones(n, 1); % Partiamo con il termine di grado 0
     
