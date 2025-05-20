@@ -178,7 +178,7 @@ for i = 1:length(k_values)
     % q = grado modello
     q = k_values(i);
     % nV è il numero di osservazioni
-    MDL(i) = (log(nV)*q)/(nV) * log(SSR(i));
+    MDL(i) = (log(nV)*q)/(nV) + log(SSR(i));
 end
 
 

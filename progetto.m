@@ -110,7 +110,7 @@ for i = 1:length(k_values)
     % q = grado modello
     q = k_values(i);
     % nV è il numero di osservazioni
-    MDL(i) = (log(nV)*q)/(nV) * log(SSR(i));
+    MDL(i) = (log(nV)*q)/(nV) + log(SSR(i));
 end
 
 
@@ -258,7 +258,7 @@ for i = 1:length(k_values)
     % q = grado modello
     q = k_values(i);
     % nV è il numero di osservazioni
-    MDL2(i) = (log(nV)*q)/(nV) * log(SSR2(i));
+    MDL2(i) = (log(nV)*q)/(nV) + log(SSR2(i));
 end
 
 % come prima il test f è sempre superato
