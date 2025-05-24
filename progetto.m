@@ -327,10 +327,6 @@ title("MDL");
 xlabel("Grado Polinomio");
 legend();
 
-%% stepwise regression
-
-
-
 
 %% plot del modello con 2 variabili come regressori
 
@@ -379,4 +375,100 @@ disp('Parametro   StdErr     IC2_inf     IC2_sup   Significativo');
 for i = 1:length(theta42v)
     fprintf('%9.4f %9.4f %11.4f %11.4f    %d\n', theta42v(i), STE(i), IC2_inf(i), IC2_sup(i), significativo(i));
 end
+
+%% stepwise regression
+
+% tabella con i dati
+tbl = table(V, T, SOClogit, 'VariableNames', {'V', 'T', 'SOClogit'});
+
+% formula 5° grado
+formula = ['SOClogit ~ 1 + V + T + ' ...
+    'V.^2 + T.^2 + V.*T + ' ...
+    'V.^3 + T.^3 + V.^2.*T + V.*T.^2 + ' ...
+    'V.^4 + T.^4 + V.^3.*T + V.^2.*T.^2 + V.*T.^3' ...
+    'V.^5 + T.^5 + V.^4.*T + V.^3.*T.^2 + V.^2.*T.^3 + V.*T.^4'];
+
+mdl5 = stepwiselm(tbl, 'poly55', 'ResponseVar', 'SOClogit', 'Verbose', 1);
+
+
+% formula 4° grado
+formula = ['SOClogit ~ 1 + V + T + ' ...
+    'V.^2 + T.^2 + V.*T + ' ...
+    'V.^3 + T.^3 + V.^2.*T + V.*T.^2 + ' ...
+    'V.^4 + T.^4 + V.^3.*T + V.^2.*T.^2 + V.*T.^3'];
+
+% poly44 è il polinomio di grado 4 in 2 variabili, Verbose per stampare i dettagli
+mdl = stepwiselm(tbl, 'poly44', 'ResponseVar', 'SOClogit', 'Verbose', 1);
+
+
+% griglia
+V_grid = linspace(min(V), max(V), 50);
+T_grid = linspace(min(T), max(T), 50);
+[VV, TT] = meshgrid(V_grid, T_grid);
+
+% rifaccio tabella
+tbl_grid = table(VV(:), TT(:), 'VariableNames', {'V', 'T'});
+
+% predizione valori
+SOClogit_pred = predict(mdl, tbl_grid);
+% reshape per usare mesh
+SOClogit_pred_grid = reshape(SOClogit_pred, size(VV));
+
+% plot modello scelto
+figure;
+mesh(VV, TT, SOClogit_pred_grid);
+hold on;
+scatter3(V, T, SOClogit, 'filled', 'MarkerEdgeColor', 'b');
+scatter3(Vval, Tval, SOCval, 'filled', 'MarkerEdgeColor', 'r');
+xlabel('V');
+ylabel('T');
+zlabel('SOClogit');
+title('Superficie modello stepwise');
+hold off;
+
+
+% ORA CALCOLO SSR validazione
+tbl_val = table(Vval, Tval, SOCval, 'VariableNames', {'V', 'T', 'SOClogit'});
+% predizione valori
+SOClogit_pred_val = predict(mdl, tbl_val);
+% calcolo
+residui_val = SOCval - SOClogit_pred_val;
+SSR_valSTEP(1) = sum(residui_val.^2);
+
+% stessa cosa per quinto grado
+SOClogit_pred_val = predict(mdl5, tbl_val);
+% calcolo
+residui_val = SOCval - SOClogit_pred_val;
+SSR_valSTEP(2) = sum(residui_val.^2);
+
+
+% ORA CALCOLO SSR identificazione
+tbl_id = table(V, T, SOClogit, 'VariableNames', {'V', 'T', 'SOClogit'});
+% predizione valori
+SOClogit_pred_id = predict(mdl, tbl_id);
+% calcolo
+residui_id = SOClogit - SOClogit_pred_id;
+SSR_idSTEP(1) = sum(residui_id.^2);
+
+% predizione valori
+SOClogit_pred_id = predict(mdl5, tbl_id);
+% calcolo
+residui_id = SOClogit - SOClogit_pred_id;
+SSR_idSTEP(2) = sum(residui_id.^2);
+
+
+% confronto Stepwise con stima LS
+figure();
+title("Confronto Stepwise e stima LS");
+hold on;
+plot(4:5, SSR2v(5:6), 'DisplayName', 'LS validazione', 'Color', 'r');
+plot(4:5, SSR2(5:6), 'DisplayName', 'LS identificazione', 'Color', 'b');
+
+plot(4:5, SSR_idSTEP, '--ko', 'DisplayName', 'SW identificazione', 'LineWidth', 2);
+plot(4:5, SSR_valSTEP, '--mo', 'DisplayName', 'SW validazione', 'LineWidth', 2);
+
+
+ylabel("SSR");
+xlabel("Grado Polinomio");
+legend();
 
