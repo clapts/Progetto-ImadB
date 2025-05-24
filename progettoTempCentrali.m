@@ -388,16 +388,6 @@ for i=1:8
     RMSE(i)=SSR2(i)/i;
 end
 
-%% confronto funzione mySOCmodel
-
-thetaModel = theta42v;
-gradoPolinomio = 4;
-save('model.mat', 'thetaModel', 'gradoPolinomio');
-
-% test
-predizione1 = mySOCmodel(V, T);
-predizioneModello = phi42var*theta42v;
-
 %% intervallo di confidenza, verifico STE polinomio grado 4
 
 IC2_inf = theta42v - 2*STE;

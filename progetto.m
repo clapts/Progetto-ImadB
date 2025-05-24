@@ -422,6 +422,11 @@ mesh(X, Y, SOCgrid);
 
 scatter3(Vval, Tval, SOCval);
 
+SSRfallimentare1var = calcSSR(Vval, SOCval, thetaModelCentral5);
+SSRfallimentare2var = calcSSR2var(phi42, thetaModelCentral4_multivar, SOCval);
+SSRfallimentare1id = calcSSR(V, SOClogit, thetaModelCentral5);
+SSRfallimentare2id = calcSSR2var(phi42var, thetaModelCentral4_multivar, SOClogit);
+
 
 %% stepwise regression
 
