@@ -376,6 +376,53 @@ for i = 1:length(theta42v)
     fprintf('%9.4f %9.4f %11.4f %11.4f    %d\n', theta42v(i), STE(i), IC2_inf(i), IC2_sup(i), significativo(i));
 end
 
+%% IDEE FALLIMENTARI
+
+%% modello strisce centrali
+
+load("modelCentralTemp.mat");
+
+% ora che ho caricato il modello con le strisce centrali faccio il plotting
+figure();
+sgtitle("Modello fallimentare di grado 5 (in 2D)");
+hold on;
+
+xgrid=linspace(min(V), max(V), 1000);
+
+y5 = lscovgridcalc(thetaModelCentral5, xgrid);
+
+subplot(1,2,1);
+hold on;
+scatter(V, expit(SOClogit), 'x');
+plot(xgrid, expit(y5), 'LineWidth', 2);
+title("Modello polinomiale spazio originario");
+
+subplot(1,2,2);
+hold on;
+scatter(V, SOClogit, 'x');
+plot(xgrid, y5, 'LineWidth', 2);
+title("Modello polinomiale spazio logit");
+
+
+% con 2 regressori
+
+% è superficie logit polinomiale
+[phi5asd, Phi5_grid, X, Y] = phicalc(4, V, T, 100);
+
+z_grid = Phi5_grid*thetaModelCentral4_multivar;
+SOCgrid=reshape(z_grid, size(X));
+
+figure();
+sgtitle("Modello fallimentare di grado 4 in 3D");
+scatter3(V, T, SOClogit);
+%è in logit
+hold on;
+
+mesh(X, Y, SOCgrid);
+
+scatter3(Vval, Tval, SOCval);
+
+
 %% stepwise regression
 
 % tabella con i dati
