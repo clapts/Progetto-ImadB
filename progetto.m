@@ -25,12 +25,12 @@ SOCval=data_val.SOC;
 
 % plotting dei dati di iddentificazione
 figure();
-scatter3(Vtrain, Ttrain, SOCtrain, 'DisplayName', 'train');
+scatter3(Vtrain, Ttrain, SOCtrain, 'DisplayName', 'train', 'MarkerEdgeColor', 'b');
 hold on;
 grid on;
 
 % plotting dei dati di validazione
-scatter3(Vval, Tval, SOCval, 'DisplayName', 'val');
+scatter3(Vval, Tval, SOCval, 'DisplayName', 'val', 'MarkerEdgeColor', 'r');
 
 xlabel("Voltage");
 ylabel("Temperature");
@@ -226,7 +226,7 @@ title("Modello polinomiale spazio logit");
 [theta12v, SSR2(2)] = autolscov2var(1, V, T, SOClogit);
 [theta22v, SSR2(3)] = autolscov2var(2, V, T, SOClogit);
 [theta32v, SSR2(4)] = autolscov2var(3, V, T, SOClogit);
-[theta42v, SSR2(5)] = autolscov2var(4, V, T, SOClogit);
+[theta42v, SSR2(5), phi42var, STE] = autolscov2var(4, V, T, SOClogit);
 [theta52v, SSR2(6)] = autolscov2var(5, V, T, SOClogit);
 [theta62v, SSR2(7)] = autolscov2var(6, V, T, SOClogit);
 [theta72v, SSR2(8)] = autolscov2var(7, V, T, SOClogit);
@@ -327,6 +327,11 @@ title("MDL");
 xlabel("Grado Polinomio");
 legend();
 
+%% stepwise regression
+
+
+
+
 %% plot del modello con 2 variabili come regressori
 
 
@@ -350,5 +355,28 @@ scatter3(Vval, Tval, SOCval);
 
 for i=1:8
     RMSE(i)=SSR2(i)/i;
+end
+
+%% confronto funzione mySOCmodel
+
+thetaModel = theta42v;
+gradoPolinomio = 4;
+save('model.mat', 'thetaModel', 'gradoPolinomio');
+
+% test
+predizione1 = mySOCmodel(V, T);
+predizioneModello = phi42var*theta42v;
+
+%% intervallo di confidenza, verifico STE polinomio grado 4
+
+IC2_inf = theta42v - 2*STE;
+IC2_sup = theta42v + 2*STE;
+
+% Verifica se l'intervallo NON contiene lo zero
+significativo = (IC2_inf > 0 & IC2_sup > 0) | (IC2_inf < 0 & IC2_sup < 0);
+
+disp('Parametro   StdErr     IC2_inf     IC2_sup   Significativo');
+for i = 1:length(theta42v)
+    fprintf('%9.4f %9.4f %11.4f %11.4f    %d\n', theta42v(i), STE(i), IC2_inf(i), IC2_sup(i), significativo(i));
 end
 
