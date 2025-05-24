@@ -15,7 +15,7 @@ close all;
 load train_data.mat
 load val_data.mat
 
-figure();
+
 Vtrain=data_train.Voltage;
 Ttrain=data_train.Temperature;
 SOCtrain=data_train.SOC;
@@ -23,16 +23,19 @@ Vval=data_val.Voltage;
 Tval=data_val.Temperature;
 SOCval=data_val.SOC;
 
+% plotting dei dati di iddentificazione
+figure();
+scatter3(Vtrain, Ttrain, SOCtrain, 'DisplayName', 'train');
 hold on;
 grid on;
 
-scatter3(Vtrain, Ttrain, SOCtrain);
+% plotting dei dati di validazione
+scatter3(Vval, Tval, SOCval, 'DisplayName', 'val');
 
-scatter3(Vval, Tval, SOCval);
 xlabel("Voltage");
 ylabel("Temperature");
 zlabel("SOC");
-title("Dati originali");
+title("Dati nello spazio originale");
 legend();
 
 
@@ -53,8 +56,8 @@ SOCval=SOCval(filtro);
 
 
 % trasformazione applico la logit sia ai dati di identificazioni che valid
-SOClogit = log(SOC./(1-SOC));
-SOCval = log(SOCval./(1-SOCval));
+SOClogit = logit(SOC);
+SOCval = logit(SOCval);
 
 
 figure();
@@ -153,6 +156,7 @@ SSRv(11) = calcSSR(Vval, SOCval, theta10);
 SSRv(12) = calcSSR(Vval, SOCval, theta11);
 
 figure();
+sgtitle("Modello con solo Tensione come regressore");
 grid on;
 legend(); % attivo la legenda
 
@@ -194,6 +198,7 @@ legend();
 
 %% visualizzazione modello scelto (5° grado, 6 parametri)
 figure();
+sgtitle("Modello di grado 5 (in 2D)");
 hold on;
 
 xgrid=linspace(min(V), max(V), 1000);
@@ -225,7 +230,6 @@ title("Modello polinomiale spazio logit");
 [theta52v, SSR2(6)] = autolscov2var(5, V, T, SOClogit);
 [theta62v, SSR2(7)] = autolscov2var(6, V, T, SOClogit);
 [theta72v, SSR2(8)] = autolscov2var(7, V, T, SOClogit);
-[theta82v, SSR2(9)] = autolscov2var(8, V, T, SOClogit);
 
 
 
@@ -276,7 +280,6 @@ phi42 = phicalc(4, Vval, Tval);
 phi52 = phicalc(5, Vval, Tval);
 phi62 = phicalc(6, Vval, Tval);
 phi72 = phicalc(7, Vval, Tval);
-phi82 = phicalc(8, Vval, Tval);
 
 
 SSR2v(1) = calcSSR2var(phi02, theta02v, SOCval);
@@ -287,13 +290,12 @@ SSR2v(5) = calcSSR2var(phi42, theta42v, SOCval);
 SSR2v(6) = calcSSR2var(phi52, theta52v, SOCval);
 SSR2v(7) = calcSSR2var(phi62, theta62v, SOCval);
 SSR2v(8) = calcSSR2var(phi72, theta72v, SOCval);
-SSR2v(9) = calcSSR2var(phi82, theta82v, SOCval);
 
 
 % plotting di AIC, MDL, FPE, Crossval
 
 figure();
-grid on;
+sgtitle("Modello con Temperatura e Tensione come regressori");
 legend(); % attivo la legenda
 
 subplot(2,2,1);
@@ -302,26 +304,26 @@ plot(0:(length(SSR2v)-1), SSR2v, 'DisplayName', 'validazione', 'Color', 'r');
 plot(0:(length(SSR2)-1), SSR2, 'DisplayName', 'identificazione', 'Color', 'b');
 hold off;
 title("Andamento SSR 2 Variabili");
-ylabel("SSR 2 Variabili");
+ylabel("SSR");
 xlabel("Grado Polinomio");
 legend();
 
 
 subplot(2,2,2);
 plot(0:(length(FPE2)-1), FPE2, 'DisplayName', 'FPE');
-title("FPE 2 var");
+title("FPE");
 xlabel("Grado Polinomio");
 legend();
 
 subplot(2,2,3);
 plot(0:(length(AIC2)-1), AIC2, 'DisplayName', 'AIC');
-title("AIC 2 var");
+title("AIC");
 xlabel("Grado Polinomio");
 legend();
 
 subplot(2,2,4);
 plot(0:(length(MDL2)-1), MDL2, 'DisplayName', 'MDL');
-title("MDL 2 var");
+title("MDL");
 xlabel("Grado Polinomio");
 legend();
 
@@ -335,6 +337,7 @@ z_grid = Phi5_grid*theta42v;
 SOCgrid=reshape(z_grid, size(X));
 
 figure();
+sgtitle("Modello polinomiale di grado 4 in 3D");
 scatter3(V, T, SOClogit);
 %è in logit
 hold on;
@@ -345,7 +348,7 @@ scatter3(Vval, Tval, SOCval);
 
 %% RMSE
 
-for i=1:9
+for i=1:8
     RMSE(i)=SSR2(i)/i;
 end
 
