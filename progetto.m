@@ -25,12 +25,12 @@ SOCval=data_val.SOC;
 
 % plotting dei dati di iddentificazione
 figure();
-scatter3(Vtrain, Ttrain, SOCtrain, 'DisplayName', 'train', 'MarkerEdgeColor', 'b');
+scatter3(Vtrain, Ttrain, SOCtrain, 'DisplayName', 'training', 'MarkerEdgeColor', 'b');
 hold on;
 grid on;
 
 % plotting dei dati di validazione
-scatter3(Vval, Tval, SOCval, 'DisplayName', 'val', 'MarkerEdgeColor', 'r');
+scatter3(Vval, Tval, SOCval, 'DisplayName', 'validazione', 'MarkerEdgeColor', 'r');
 
 xlabel("Voltage");
 ylabel("Temperature");
@@ -66,6 +66,7 @@ grid on;
 xlabel("Voltage");
 ylabel("Temperature");
 zlabel("SOC");
+title("Dati nello spazio logit");
 
 %% modelli
 nV=length(SOClogit);
@@ -208,14 +209,18 @@ y5 = lscovgridcalc(theta5, xgrid);
 subplot(1,2,1);
 hold on;
 scatter(V, expit(SOClogit), 'x');
-plot(xgrid, expit(y5), 'LineWidth', 2);
+plot(xgrid, expit(y5), 'LineWidth', 3, 'Color', 'r');
 title("Modello polinomiale spazio originario");
 
 subplot(1,2,2);
 hold on;
 scatter(V, SOClogit, 'x');
-plot(xgrid, y5, 'LineWidth', 2);
+plot(xgrid, y5, 'LineWidth', 3, 'Color', 'r');
 title("Modello polinomiale spazio logit");
+
+% scelto modello 6
+SSRgrado5regrV=SSR(6);
+SSRgrado5regrVval=SSRv(6);
 
 
 %% aggiungo temperatura
@@ -347,6 +352,10 @@ mesh(X, Y, SOCgrid);
 
 scatter3(Vval, Tval, SOCval);
 
+% scelto modello grado 4
+SSRgrado4regrVT=SSR2(5);
+SSRgrado4regrVTval=SSR2v(5);
+
 %% RMSE
 
 for i=1:8
@@ -363,17 +372,19 @@ save('model.mat', 'thetaModel', 'gradoPolinomio');
 predizione1 = mySOCmodel(V, T);
 predizioneModello = phi42var*theta42v;
 
+SSRgrado5regrV=SSR(6);
+
 %% intervallo di confidenza, verifico STE polinomio grado 4
 
-IC2_inf = theta42v - 2*STE;
-IC2_sup = theta42v + 2*STE;
+IC_inf = theta42v - 2*STE;
+IC_sup = theta42v + 2*STE;
 
 % Verifica se l'intervallo NON contiene lo zero
-significativo = (IC2_inf > 0 & IC2_sup > 0) | (IC2_inf < 0 & IC2_sup < 0);
+significativo = (IC_inf > 0 & IC_sup > 0) | (IC_inf < 0 & IC_sup < 0);
 
-disp('Parametro   StdErr     IC2_inf     IC2_sup   Significativo');
+disp('Parametro   StdErr     IC_inf     IC_sup   Significativo');
 for i = 1:length(theta42v)
-    fprintf('%9.4f %9.4f %11.4f %11.4f    %d\n', theta42v(i), STE(i), IC2_inf(i), IC2_sup(i), significativo(i));
+    fprintf('%9.4f %9.4f %11.4f %11.4f    %d\n', theta42v(i), STE(i), IC_inf(i), IC_sup(i), significativo(i));
 end
 
 %% IDEE FALLIMENTARI
@@ -394,13 +405,13 @@ y5 = lscovgridcalc(thetaModelCentral5, xgrid);
 subplot(1,2,1);
 hold on;
 scatter(V, expit(SOClogit), 'x');
-plot(xgrid, expit(y5), 'LineWidth', 2);
+plot(xgrid, expit(y5), 'LineWidth', 3, 'Color', 'r');
 title("Modello polinomiale spazio originario");
 
 subplot(1,2,2);
 hold on;
 scatter(V, SOClogit, 'x');
-plot(xgrid, y5, 'LineWidth', 2);
+plot(xgrid, y5, 'LineWidth', 3, 'Color', 'r');
 title("Modello polinomiale spazio logit");
 
 
@@ -422,8 +433,8 @@ mesh(X, Y, SOCgrid);
 
 scatter3(Vval, Tval, SOCval);
 
-SSRfallimentare1var = calcSSR(Vval, SOCval, thetaModelCentral5);
-SSRfallimentare2var = calcSSR2var(phi42, thetaModelCentral4_multivar, SOCval);
+SSRfallimentare1val = calcSSR(Vval, SOCval, thetaModelCentral5);
+SSRfallimentare2val = calcSSR2var(phi42, thetaModelCentral4_multivar, SOCval);
 SSRfallimentare1id = calcSSR(V, SOClogit, thetaModelCentral5);
 SSRfallimentare2id = calcSSR2var(phi42var, thetaModelCentral4_multivar, SOClogit);
 
@@ -519,8 +530,25 @@ plot(4:5, SSR2(5:6), 'DisplayName', 'LS identificazione', 'Color', 'b');
 plot(4:5, SSR_idSTEP, '--ko', 'DisplayName', 'SW identificazione', 'LineWidth', 2);
 plot(4:5, SSR_valSTEP, '--mo', 'DisplayName', 'SW validazione', 'LineWidth', 2);
 
+xlim([3.95 5.05]);
+ylim([50 2800]);
 
 ylabel("SSR");
 xlabel("Grado Polinomio");
 legend();
 
+
+SSR_idSTEPgr4=SSR_idSTEP(1);
+SSR_valSTEPgr4=SSR_valSTEP(1);
+%% confronto modelli fallimentari
+
+Models = ["Modello 1 regr. (5°)";
+            "Modello 1 regr. temp. cent. (5°)";
+            "Modello 2 regr. (4°)";
+            "Modello 2 regr. temp. cent. (4°)";
+            "Modello 2 regr. SW (4°)"];
+
+SSRid = [SSRgrado5regrV; SSRfallimentare1id; SSRgrado4regrVT;SSRfallimentare2id;SSR_idSTEPgr4];
+SSRvAll = [SSRgrado5regrVval; SSRfallimentare1val; SSRgrado4regrVTval;SSRfallimentare2val;SSR_valSTEPgr4];
+
+modelli=table(Models, SSRid, SSRvAll)
