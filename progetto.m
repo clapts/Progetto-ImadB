@@ -444,21 +444,8 @@ SSRfallimentare2id = calcSSR2var(phi42var, thetaModelCentral4_multivar, SOClogit
 % tabella con i dati
 tbl = table(V, T, SOClogit, 'VariableNames', {'V', 'T', 'SOClogit'});
 
-% formula 5° grado
-formula = ['SOClogit ~ 1 + V + T + ' ...
-    'V.^2 + T.^2 + V.*T + ' ...
-    'V.^3 + T.^3 + V.^2.*T + V.*T.^2 + ' ...
-    'V.^4 + T.^4 + V.^3.*T + V.^2.*T.^2 + V.*T.^3' ...
-    'V.^5 + T.^5 + V.^4.*T + V.^3.*T.^2 + V.^2.*T.^3 + V.*T.^4'];
 
 mdl5 = stepwiselm(tbl, 'poly55', 'ResponseVar', 'SOClogit', 'Verbose', 1);
-
-
-% formula 4° grado
-formula = ['SOClogit ~ 1 + V + T + ' ...
-    'V.^2 + T.^2 + V.*T + ' ...
-    'V.^3 + T.^3 + V.^2.*T + V.*T.^2 + ' ...
-    'V.^4 + T.^4 + V.^3.*T + V.^2.*T.^2 + V.*T.^3'];
 
 % poly44 è il polinomio di grado 4 in 2 variabili, Verbose per stampare i dettagli
 mdl = stepwiselm(tbl, 'poly44', 'ResponseVar', 'SOClogit', 'Verbose', 1);
@@ -540,6 +527,8 @@ legend();
 
 SSR_idSTEPgr4=SSR_idSTEP(1);
 SSR_valSTEPgr4=SSR_valSTEP(1);
+
+
 %% confronto modelli fallimentari
 
 Models = ["Modello 1 regr. (5°)";
@@ -552,3 +541,56 @@ SSRid = [SSRgrado5regrV; SSRfallimentare1id; SSRgrado4regrVT;SSRfallimentare2id;
 SSRvAll = [SSRgrado5regrVval; SSRfallimentare1val; SSRgrado4regrVTval;SSRfallimentare2val;SSR_valSTEPgr4];
 
 modelli=table(Models, SSRid, SSRvAll)
+
+
+
+%% stepwise regression
+
+% tabella con i dati
+tbl = table(V, T, SOClogit, 'VariableNames', {'V', 'T', 'SOClogit'});
+
+mdl54 = stepwiselm(tbl, 'poly54', 'ResponseVar', 'SOClogit', 'Verbose', 1);
+
+
+% griglia
+V_grid = linspace(min(V), max(V), 50);
+T_grid = linspace(min(T), max(T), 50);
+[VV, TT] = meshgrid(V_grid, T_grid);
+
+% rifaccio tabella
+tbl_grid = table(VV(:), TT(:), 'VariableNames', {'V', 'T'});
+
+% predizione valori
+SOClogit_pred = predict(mdl54, tbl_grid);
+% reshape per usare mesh
+SOClogit_pred_grid = reshape(SOClogit_pred, size(VV));
+
+% plot modello scelto
+figure;
+mesh(VV, TT, SOClogit_pred_grid);
+hold on;
+scatter3(V, T, SOClogit, 'filled', 'MarkerEdgeColor', 'b');
+scatter3(Vval, Tval, SOCval, 'filled', 'MarkerEdgeColor', 'r');
+xlabel('V');
+ylabel('T');
+zlabel('SOClogit');
+title('Superficie modello stepwise 54');
+hold off;
+
+
+% calcolo ssrv
+tbl_val = table(Vval, Tval, SOCval, 'VariableNames', {'V', 'T', 'SOClogit'});
+SOClogit_pred_val = predict(mdl54, tbl_val);
+residui_val = SOCval - SOClogit_pred_val;
+SSR_valSTEP54 = sum(residui_val.^2);
+
+
+% ORA CALCOLO SSR identificazione
+tbl_id = table(V, T, SOClogit, 'VariableNames', {'V', 'T', 'SOClogit'});
+% predizione valori
+SOClogit_pred_id = predict(mdl54, tbl_id);
+% calcolo
+residui_id = SOClogit - SOClogit_pred_id;
+SSR_idSTEP54 = sum(residui_id.^2);
+
+RMSE = sqrt(SSR_idSTEP54/nV)
