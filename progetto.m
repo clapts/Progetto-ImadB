@@ -359,7 +359,7 @@ SSRgrado4regrVTval=SSR2v(5);
 %% RMSE
 
 for i=1:8
-    RMSE(i)=SSR2(i)/i;
+    RMSE(i)=sqrt(SSR2(i)/nV);
 end
 
 %% confronto funzione mySOCmodel
