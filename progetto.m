@@ -593,4 +593,44 @@ SOClogit_pred_id = predict(mdl54, tbl_id);
 residui_id = SOClogit - SOClogit_pred_id;
 SSR_idSTEP54 = sum(residui_id.^2);
 
-RMSE = sqrt(SSR_idSTEP54/nV)
+RMSEstep54 = sqrt(SSR_idSTEP54/nV)
+
+%% LS 54
+
+Phi54 = [V.^0 , V , T ,  ...
+    V.^2 , T.^2 , V.*T , ...
+    V.^3 , T.^3 , V.^2.*T , V.*T.^2 ,  ...
+    V.^4 , T.^4 , V.^3.*T , V.^2.*T.^2 , V.*T.^3 ...
+    V.^5 , V.^4.*T , V.^3.*T.^2 , V.^2.*T.^3 , V.*T.^4];
+
+theta54=lscov(Phi54, SOClogit);
+
+V_grid = linspace(min(V), max(V), 50);
+T_grid = linspace(min(T), max(T), 50);
+[VV, TT] = meshgrid(V_grid, T_grid);
+
+phi54grid = [ ...
+    ones(numel(VV),1), ...
+    VV(:), TT(:), ...
+    VV(:).^2, TT(:).^2, VV(:).*TT(:), ...
+    VV(:).^3, TT(:).^3, VV(:).^2.*TT(:), VV(:).*TT(:).^2, ...
+    VV(:).^4, TT(:).^4, VV(:).^3.*TT(:), VV(:).^2.*TT(:).^2, VV(:).*TT(:).^3, ...
+    VV(:).^5, VV(:).^4.*TT(:), VV(:).^3.*TT(:).^2, VV(:).^2.*TT(:).^3, VV(:).*TT(:).^4 ...
+];
+
+zMesh = phi54grid * theta54;
+zMesh = reshape(zMesh, size(VV));
+
+figure();
+mesh(VV, TT, zMesh);
+hold on;
+scatter3(V, T, SOClogit, 'filled', 'MarkerEdgeColor', 'b');
+scatter3(Vval, Tval, SOCval, 'filled', 'MarkerEdgeColor', 'r');
+xlabel('V');
+ylabel('T');
+zlabel('SOClogit');
+title('Superficie modello LS 54');
+hold off;
+
+
+RMSEls54 = sqrt(SSR_idSTEP54/nV)
